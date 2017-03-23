@@ -10,20 +10,37 @@ import netaddr
 
 
 class TestObj(SyncObj):
+    q_count = 0
 
     def __init__(self, selfNodeAddr, otherNodeAddrs):
         super(TestObj, self).__init__(selfNodeAddr, otherNodeAddrs)
-        self.__size = 0
-        self.label = 0
-        self.queue_id 
+        self.size = []
+        self.label = []
+        self.id = []
+        self.data = []
 
     @replicated
-    def incCounter(self):
-        self.__counter += 1
-        return self.__counter
+    def create(self,label):
+        self.label.append(label)
+        self.id.append(TestObj.q_count)
+        self.size.append(-1)
+        TestObj.q_count = TestObj.q_count+1
+        self.data.append([])
+        print "in create method"
 
-    def getCounter(self):
-        return self.__counter
+    @replicated
+    def pop(self,q_id):
+        item = self.data[q_id][self.size[q_id]]
+        self.data[q_id].remove(item)
+        self.size[q_id] = self.size[q_id] - 1
+        print "pop_method", item
+
+    @replicated
+    def push(self,q_id,item):
+        self.size[q_id] = self.size[q_id] + 1
+        self.data[q_id].append(item)
+        print "push_method", item, self.data[q_id][self.size[q_id]]
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -33,31 +50,63 @@ if __name__ == '__main__':
     UDP_IP = "localhost"
 
 
-
     port = int(sys.argv[1])
     partners = ['localhost:%d' % int(p) for p in sys.argv[2:]]
-    o = TestObj('localhost:%d' % port, partners)
-    n = 0
-    old_value = -1
+    sock = socket.socket(socket.AF_INET,        # Internet
+                             socket.SOCK_DGRAM)     # UDP
+    sock.setblocking(False)
+
+    sock.bind((UDP_IP,(int(sys.argv[1]))))               # Bind the socket
+
+
+    o=TestObj('localhost:%d' % port, partners)
+
 
     while True:
-        if o.getCounter() != old_value:
-            old_value = o.getCounter()
         if o._getLeader() is None:
             continue
 
-        sock = socket.socket(socket.AF_INET,        # Internet
-                                 socket.SOCK_DGRAM)     # UDP
-
-        sock.bind((UDP_IP,(int(sys.argv[1]))))               # Bind the socket
+        data = "0,0,0"
 
         try:
             data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-        except socket.error:
-            print ""
+        except:
+            pass
 
-        if (data == "INC"):             # Check if it is the request for TIME Sync
-            o.incCounter();
+        data_parsed = data.split(',')
+        command = int(data_parsed[0])
+        param1 = int(data_parsed[1])
+        param2 = int(data_parsed[2])
+        if (command == 1):             # Check if it is the request for TIME Sync
+            print "init"
+            o.create(param1)
+            print "created"
+            sock.sendto(str(TestObj.q_count),addr)
+            time.sleep(1)
+            print "id sent"
+            time.sleep(1)
 
-        if (data == "GET"):
-            sock.sendto(str(o.getCounter()),addr)
+        if (command == 2):
+            sock.sendto(str(o[param1].getCounter()),addr)
+
+        if (command == 3):
+            print "push"
+            print param1
+            print param2
+            o.push(param1,param2)
+            print "pushed"
+            time.sleep(1)
+
+        if (command == 4):
+            print "pop"
+            sock.sendto(str(o.data[param1][o.size[param1]]),addr)
+            o.pop(param1)
+            time.sleep(1)
+
+        if (command == 5):
+            print "top"
+            sock.sendto(str(o.data[param1][0]),addr)
+
+        if (command == 6):
+            print "size"
+            sock.sendto(str(o.size[param1] + 1),addr)
