@@ -87,7 +87,7 @@ if __name__ == '__main__':
             time.sleep(1)
 
         if (command == 2):
-            sock.sendto(str(o[param1].getCounter()),addr)
+            sock.sendto(str(o.label.index(param1)),addr)
 
         if (command == 3):
             print "push"

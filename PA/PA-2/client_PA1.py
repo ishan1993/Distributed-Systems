@@ -33,7 +33,7 @@ while(1):
         print "id - ", data
     elif(command == "qId"):
         label = input_parsed[1]
-        sock.sendto("1,"+str(label)+",0", (UDP_IP, UDP_PORT))
+        sock.sendto("2,"+str(label)+",0", (UDP_IP, UDP_PORT))
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
         print "id - ", data
     elif(command == "qPush"):
