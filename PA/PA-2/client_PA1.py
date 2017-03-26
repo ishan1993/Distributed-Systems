@@ -5,9 +5,9 @@ import sys
 import time
 
 UDP_IP = "localhost"    # Server's IP
-UDP_PORT = 5001         # Server's Port
+UDP_PORT = 0
 data = 0                # Variable to check if any data is received
-
+n = len(sys.argv)
 sock = socket.socket(socket.AF_INET,    # Internet
                      socket.SOCK_DGRAM) # UDP
 
@@ -15,6 +15,24 @@ sock = socket.socket(socket.AF_INET,    # Internet
 
 
 while(1):
+    i = 0
+    while i in range (0,(n-1)):
+        i = i+1
+        UDP_PORT = int(sys.argv[i])
+        sock1 = socket.socket(socket.AF_INET,    # Internet
+                             socket.SOCK_DGRAM) # UDP
+        sock1.setblocking(False)
+        sock1.sendto("7,0,0", (UDP_IP, UDP_PORT))
+        try:
+            data, addr = sock1.recvfrom(1024) # buffer size is 1024 bytes
+            break
+        except:
+            print "except"
+            if i == n:
+                print "All servers down"
+                exit()
+            continue
+
     print "Available commands\n\n"
     print "1. qCreate <label>"
     print "2. qId <label>"

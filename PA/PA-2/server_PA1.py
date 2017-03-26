@@ -6,14 +6,13 @@ import time
 from functools import partial
 sys.path.append("../")
 from pysyncobj import SyncObj, replicated
-import netaddr
 
 
-class TestObj(SyncObj):
+class QueObj(SyncObj):
     q_count = 0
 
     def __init__(self, selfNodeAddr, otherNodeAddrs):
-        super(TestObj, self).__init__(selfNodeAddr, otherNodeAddrs)
+        super(QueObj, self).__init__(selfNodeAddr, otherNodeAddrs)
         self.size = []
         self.label = []
         self.id = []
@@ -22,9 +21,9 @@ class TestObj(SyncObj):
     @replicated
     def create(self,label):
         self.label.append(label)
-        self.id.append(TestObj.q_count)
+        self.id.append(QueObj.q_count)
         self.size.append(-1)
-        TestObj.q_count = TestObj.q_count+1
+        QueObj.q_count = QueObj.q_count+1
         self.data.append([])
         print "in create method"
 
@@ -59,7 +58,7 @@ if __name__ == '__main__':
     sock.bind((UDP_IP,(int(sys.argv[1]))))               # Bind the socket
 
 
-    o=TestObj('localhost:%d' % port, partners)
+    o=QueObj('localhost:%d' % port, partners)
 
 
     while True:
@@ -81,7 +80,7 @@ if __name__ == '__main__':
             print "init"
             o.create(param1)
             print "created"
-            sock.sendto(str(TestObj.q_count),addr)
+            sock.sendto(str(QueObj.q_count),addr)
             time.sleep(1)
             print "id sent"
             time.sleep(1)
@@ -110,3 +109,7 @@ if __name__ == '__main__':
         if (command == 6):
             print "size"
             sock.sendto(str(o.size[param1] + 1),addr)
+
+        if (command == 7):
+            print "ping"
+            sock.sendto("ping",addr)
