@@ -27,7 +27,6 @@ while(1):
             data, addr = sock1.recvfrom(1024) # buffer size is 1024 bytes
             break
         except:
-            print "except"
             if i == n:
                 print "All servers down"
                 exit()

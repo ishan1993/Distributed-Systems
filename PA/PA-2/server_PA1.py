@@ -25,20 +25,17 @@ class QueObj(SyncObj):
         self.size.append(-1)
         QueObj.q_count = QueObj.q_count+1
         self.data.append([])
-        print "in create method"
 
     @replicated
     def pop(self,q_id):
         item = self.data[q_id][self.size[q_id]]
         self.data[q_id].remove(item)
         self.size[q_id] = self.size[q_id] - 1
-        print "pop_method", item
 
     @replicated
     def push(self,q_id,item):
         self.size[q_id] = self.size[q_id] + 1
         self.data[q_id].append(item)
-        print "push_method", item, self.data[q_id][self.size[q_id]]
 
 
 if __name__ == '__main__':
@@ -77,39 +74,31 @@ if __name__ == '__main__':
         param1 = int(data_parsed[1])
         param2 = int(data_parsed[2])
         if (command == 1):             # Check if it is the request for TIME Sync
-            print "init"
             o.create(param1)
-            print "created"
             sock.sendto(str(QueObj.q_count),addr)
-            time.sleep(1)
-            print "id sent"
-            time.sleep(1)
+            time.sleep(2)
 
         if (command == 2):
             sock.sendto(str(o.label.index(param1)),addr)
 
         if (command == 3):
-            print "push"
-            print param1
-            print param2
+            print "push ",param1,param2
             o.push(param1,param2)
-            print "pushed"
             time.sleep(1)
 
         if (command == 4):
-            print "pop"
+            print "pop ",param1
             sock.sendto(str(o.data[param1][o.size[param1]]),addr)
             o.pop(param1)
             time.sleep(1)
 
         if (command == 5):
-            print "top"
+            print "top ",param1
             sock.sendto(str(o.data[param1][0]),addr)
 
         if (command == 6):
-            print "size"
+            print "size ",param1
             sock.sendto(str(o.size[param1] + 1),addr)
 
         if (command == 7):
-            print "ping"
             sock.sendto("ping",addr)
