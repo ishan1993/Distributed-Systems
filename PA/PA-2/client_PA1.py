@@ -13,21 +13,32 @@ sock = socket.socket(socket.AF_INET,    # Internet
 
 while(1):
     i = 0
-    while i in range (0,(n-1)):
+    UDP_PORT = int(sys.argv[1])
+    while i<3:
         i = i+1
         UDP_PORT = int(sys.argv[i])
         sock1 = socket.socket(socket.AF_INET,    # Internet
                              socket.SOCK_DGRAM) # UDP
         sock1.setblocking(False)
         sock1.sendto("7,0,0", (UDP_IP, UDP_PORT))
+        time.sleep(1)
         try:
             data, addr = sock1.recvfrom(1024) # buffer size is 1024 bytes
-            break
+
+            if data == "ping":
+                break
+            else:
+                if i == n:
+                    exit()
+                else:
+                    continue
+
         except:
             if i == n:
-                print "All servers down"
                 exit()
-            continue
+            else:
+                continue
+
 
     print "Available commands\n\n"
     print "1. qCreate <label>"

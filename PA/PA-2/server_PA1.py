@@ -101,4 +101,5 @@ if __name__ == '__main__':
             sock.sendto(str(o.size[param1] + 1),addr)
 
         if (command == 7):
+            print "ping"
             sock.sendto("ping",addr)
