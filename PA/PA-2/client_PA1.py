@@ -11,9 +11,6 @@ n = len(sys.argv)
 sock = socket.socket(socket.AF_INET,    # Internet
                      socket.SOCK_DGRAM) # UDP
 
-
-
-
 while(1):
     i = 0
     while i in range (0,(n-1)):
@@ -39,6 +36,7 @@ while(1):
     print "4. qPop <qId>"
     print "5. qTop <qId>"
     print "6. qSize <qId>"
+    print "7. refresh"
     user_input =  str(raw_input())
     input_parsed = user_input.split(' ')
     command = input_parsed[0]
@@ -72,5 +70,8 @@ while(1):
         sock.sendto("6,"+str(qId)+",0", (UDP_IP, UDP_PORT))
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
         print data
+    elif(command == "refresh"):
+        time.sleep(1)
+        continue
     else:
         print "Invalid command"
