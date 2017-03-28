@@ -12,6 +12,19 @@ sock = socket.socket(socket.AF_INET,    # Internet
                      socket.SOCK_DGRAM) # UDP
 
 while(1):
+
+    print "Available commands\n\n"
+    print "1. qCreate <label>"
+    print "2. qId <label>"
+    print "3. qPush <qId> <item>"
+    print "4. qPop <qId>"
+    print "5. qTop <qId>"
+    print "6. qSize <qId>"
+
+    user_input =  str(raw_input())
+    input_parsed = user_input.split(' ')
+    command = input_parsed[0]
+
     i = 0
     UDP_PORT = int(sys.argv[1])
     while i<3:
@@ -38,19 +51,6 @@ while(1):
                 exit()
             else:
                 continue
-
-
-    print "Available commands\n\n"
-    print "1. qCreate <label>"
-    print "2. qId <label>"
-    print "3. qPush <qId> <item>"
-    print "4. qPop <qId>"
-    print "5. qTop <qId>"
-    print "6. qSize <qId>"
-    print "7. refresh"
-    user_input =  str(raw_input())
-    input_parsed = user_input.split(' ')
-    command = input_parsed[0]
 
     if(command == "qCreate"):
         label = input_parsed[1]
@@ -81,8 +81,5 @@ while(1):
         sock.sendto("6,"+str(qId)+",0", (UDP_IP, UDP_PORT))
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
         print data
-    elif(command == "refresh"):
-        time.sleep(1)
-        continue
     else:
         print "Invalid command"
